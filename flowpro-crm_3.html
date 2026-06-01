@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowPro CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>
+<style>
+:root{--bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;--accent:#2ea8ff;--accent2:#f78166;--accent3:#56d364;--text:#e6edf3;--text2:#8b949e;--text3:#484f58;--warning:#e3b341;--radius:10px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden;font-size:14px;}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.logo{padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+.logo-mark{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.logo-text{font-size:16px;font-weight:700;letter-spacing:-0.3px;}
+.logo-sub{font-size:10px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
+nav{padding:12px 8px;flex:1;overflow-y:auto;}
+.nav-section{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);padding:8px 8px 4px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;cursor:pointer;color:var(--text2);transition:all 0.15s;margin-bottom:2px;font-size:13px;font-weight:500;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:rgba(46,168,255,0.12);color:var(--accent);}
+.nav-item .icon{width:18px;text-align:center;font-size:15px;}
+.nav-badge{margin-left:auto;background:var(--accent2);color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;}
+.sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);}
+.ai-badge{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(46,168,255,0.08);border:1px solid rgba(46,168,255,0.2);border-radius:6px;cursor:pointer;transition:all 0.15s;}
+.ai-badge:hover{background:rgba(46,168,255,0.15);}
+.ai-dot{width:8px;height:8px;background:var(--accent3);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.ai-label{font-size:12px;font-weight:600;color:var(--accent);}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{padding:14px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);}
+.page-title{font-size:18px;font-weight:700;letter-spacing:-0.3px;}
+.topbar-actions{display:flex;gap:8px;align-items:center;}
+.btn{padding:7px 14px;border-radius:6px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all 0.15s;}
+.btn-primary{background:var(--accent);color:#000;}
+.btn-primary:hover{background:#5bbeff;}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--surface2);color:var(--text);}
+.btn-danger{background:rgba(247,129,102,0.15);color:var(--accent2);border:1px solid rgba(247,129,102,0.3);}
+.btn-danger:hover{background:rgba(247,129,102,0.25);}
+.btn-sm{padding:4px 10px;font-size:11px;}
+.content{flex:1;overflow-y:auto;padding:24px;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text2);margin-bottom:10px;font-weight:600;}
+.stat-value{font-size:28px;font-weight:700;letter-spacing:-1px;}
+.stat-value.blue{color:var(--accent);}
+.stat-value.green{color:var(--accent3);}
+.stat-value.orange{color:var(--accent2);}
+.stat-value.yellow{color:var(--warning);}
+.stat-change{font-size:12px;color:var(--text2);margin-top:4px;}
+.stat-change.up{color:var(--accent3);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text2);}
+.job-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.job-item:last-child{border-bottom:none;}
+.job-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.job-dot.active{background:var(--accent3);box-shadow:0 0 6px var(--accent3);}
+.job-dot.pending{background:var(--warning);}
+.job-dot.scheduled{background:var(--accent);}
+.job-dot.completed{background:var(--text3);}
+.job-info{flex:1;min-width:0;}
+.job-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.job-meta{font-size:11px;color:var(--text2);margin-top:2px;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+.badge-green{background:rgba(86,211,100,0.15);color:var(--accent3);}
+.badge-blue{background:rgba(46,168,255,0.15);color:var(--accent);}
+.badge-orange{background:rgba(247,129,102,0.15);color:var(--accent2);}
+.badge-yellow{background:rgba(227,179,65,0.15);color:var(--warning);}
+.badge-grey{background:rgba(139,148,158,0.15);color:var(--text2);}
+.tech-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.tech-item:last-child{border-bottom:none;}
+.tech-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;}
+.tech-info{flex:1;}
+.tech-name{font-size:13px;font-weight:600;}
+.tech-job{font-size:11px;color:var(--text2);margin-top:2px;}
+.page{display:none;}
+.page.active{display:block;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text2);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--border);}
+td{padding:12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+tr:last-child td{border-bottom:none;}
+.clickable-row{cursor:pointer;}
+.clickable-row:hover td{background:rgba(46,168,255,0.04);}
+.ai-panel{position:fixed;right:0;top:0;bottom:0;width:380px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.3s ease;z-index:100;}
+.ai-panel.open{transform:translateX(0);}
+.ai-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.ai-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.ai-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.msg{max-width:90%;}
+.msg.user{align-self:flex-end;}
+.msg.assistant{align-self:flex-start;}
+.msg-bubble{padding:10px 14px;border-radius:10px;font-size:13px;line-height:1.5;}
+.msg.user .msg-bubble{background:var(--accent);color:#000;font-weight:500;}
+.msg.assistant .msg-bubble{background:var(--surface2);border:1px solid var(--border);}
+.msg-label{font-size:10px;color:var(--text3);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.msg.user .msg-label{text-align:right;}
+.ai-input-area{padding:16px;border-top:1px solid var(--border);}
+.ai-input-row{display:flex;gap:8px;}
+.ai-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:inherit;font-size:13px;outline:none;resize:none;}
+.ai-input:focus{border-color:var(--accent);}
+.ai-send{background:var(--accent);border:none;border-radius:8px;width:38px;height:38px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#000;font-size:16px;transition:background 0.15s;flex-shrink:0;}
+.ai-send:hover{background:#5bbeff;}
+.ai-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.ai-suggestion{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;color:var(--text2);transition:all 0.15s;font-weight:500;}
+.ai-suggestion:hover{border-color:var(--accent);color:var(--accent);background:rgba(46,168,255,0.08);}
+.typing{display:flex;gap:4px;align-items:center;padding:10px 14px;}
+.typing span{width:6px;height:6px;background:var(--text3);border-radius:50%;animation:bounce 1.2s infinite;}
+.typing span:nth-child(2){animation-delay:0.2s;}
+.typing span:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:520px;max-height:85vh;overflow-y:auto;}
+.modal-lg{width:680px;}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:16px;font-weight:700;}
+.modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1;}
+.modal-body{padding:20px 24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
+.form-group{margin-bottom:16px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+input,select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;color:var(--text);font-family:inherit;font-size:13px;outline:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+select option{background:var(--surface2);}
+textarea{resize:vertical;min-height:80px;}
+.notes-section{margin-top:20px;border-top:1px solid var(--border);padding-top:16px;}
+.note-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;}
+.note-meta{font-size:11px;color:var(--text3);margin-bottom:6px;}
+.note-text{font-size:13px;line-height:1.5;}
+.note-input-row{display:flex;gap:8px;margin-top:10px;}
+.note-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;outline:none;}
+.note-input:focus{border-color:var(--accent);}
+.customer-hero{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.customer-avatar-lg{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;background:rgba(46,168,255,0.15);color:var(--accent);}
+.customer-name-lg{font-size:20px;font-weight:700;letter-spacing:-0.3px;}
+.customer-meta-lg{font-size:13px;color:var(--text2);margin-top:4px;}
+.search-bar{display:flex;gap:10px;margin-bottom:16px;}
+.search-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px 14px;color:var(--text);font-family:inherit;font-size:13px;outline:none;}
+.search-input:focus{border-color:var(--accent);}
+.activity-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.activity-item:last-child{border-bottom:none;}
+.activity-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:2px;}
+.activity-content{flex:1;}
+.activity-text{font-size:13px;}
+.activity-time{font-size:11px;color:var(--text2);margin-top:2px;}
+.chart-wrap{position:relative;height:200px;}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.save-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--accent3);color:#000;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;opacity:0;transition:opacity 0.3s;z-index:300;pointer-events:none;}
+.save-toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="logo"><div class="logo-mark"><div class="logo-icon">&#128295;</div><div><div class="logo-text">FlowPro</div><div class="logo-sub">CRM</div></div></div></div>
+  <nav>
+    <div class="nav-section">Main</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="icon">&#128202;</span>Dashboard</div>
+    <div class="nav-item" onclick="showPage('jobs',this)"><span class="icon">&#128297;</span>Jobs<span class="nav-badge" id="jobs-badge">0</span></div>
+    <div class="nav-item" onclick="showPage('customers',this)"><span class="icon">&#128101;</span>Customers</div>
+    <div class="nav-section">Team</div>
+    <div class="nav-item" onclick="showPage('technicians',this)"><span class="icon">&#128119;</span>Technicians</div>
+    <div class="nav-item" onclick="showPage('schedule',this)"><span class="icon">&#128197;</span>Schedule</div>
+    <div class="nav-section">Finance</div>
+    <div class="nav-item" onclick="showPage('quotes',this)"><span class="icon">&#128176;</span>Quotes</div>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="ai-badge" onclick="toggleAI()"><div class="ai-dot"></div><div class="ai-label">AI Agent</div><span style="margin-left:auto;font-size:12px;color:var(--text2)">Open &#8594;</span></div>
+  </div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div class="page-title" id="page-title">Dashboard</div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="toggleAI()">&#129302; Ask AI</button>
+      <button class="btn btn-primary" id="add-btn" onclick="openAddModal()">+ New Job</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Active Jobs</div><div class="stat-value blue" id="s-active">0</div><div class="stat-change" id="s-active-sub"></div></div>
+        <div class="stat-card"><div class="stat-label">Jobs Today</div><div class="stat-value green" id="s-today">0</div><div class="stat-change" id="s-today-sub"></div></div>
+        <div class="stat-card"><div class="stat-label">On-Site Techs</div><div class="stat-value yellow" id="s-techs">0</div><div class="stat-change" id="s-techs-sub"></div></div>
+        <div class="stat-card"><div class="stat-label">Quotes Pipeline</div><div class="stat-value orange" id="s-quotes">0</div><div class="stat-change" id="s-quotes-sub"></div></div>
+      </div>
+      <div class="two-col">
+        <div class="card"><div class="card-header"><div class="card-title">Jobs by Status</div></div><div class="chart-wrap"><canvas id="chart-status"></canvas></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Jobs by Priority</div></div><div class="chart-wrap"><canvas id="chart-priority"></canvas></div></div>
+      </div>
+      <div class="two-col">
+        <div class="card"><div class="card-header"><div class="card-title">Live Jobs</div><span class="badge badge-green">&#9679; Live</span></div><div id="dash-jobs"></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Technicians</div></div><div id="dash-techs"></div></div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Recent Activity</div></div><div id="dash-activity"></div></div>
+    </div>
+    <div class="page" id="page-jobs">
+      <div class="search-bar">
+        <input class="search-input" id="job-search" placeholder="Search jobs..." oninput="renderJobs()">
+        <select id="job-status-filter" onchange="renderJobs()" style="width:auto;min-width:140px"><option value="">All Status</option><option value="active">Active</option><option value="scheduled">Scheduled</option><option value="pending">Pending</option><option value="completed">Completed</option></select>
+        <select id="job-priority-filter" onchange="renderJobs()" style="width:auto;min-width:130px"><option value="">All Priority</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
+      </div>
+      <div class="card" style="padding:0"><table><thead><tr><th>Job</th><th>Customer</th><th>Technician</th><th>Status</th><th>Priority</th><th>Date</th><th>Notes</th><th></th></tr></thead><tbody id="jobs-table"></tbody></table></div>
+    </div>
+    <div class="page" id="page-customers">
+      <div class="search-bar"><input class="search-input" id="cust-search" placeholder="Search customers..." oninput="renderCustomers()"></div>
+      <div class="card" style="padding:0"><table><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Address</th><th>Jobs</th><th>Last Job</th><th></th></tr></thead><tbody id="customers-table"></tbody></table></div>
+    </div>
+    <div class="page" id="page-technicians">
+      <div class="card" style="padding:0"><table><thead><tr><th>Technician</th><th>Phone</th><th>Status</th><th>Current Job</th><th>Jobs Today</th><th>Skills</th><th></th></tr></thead><tbody id="techs-table"></tbody></table></div>
+    </div>
+    <div class="page" id="page-schedule">
+      <div class="card"><div class="card-header"><div class="card-title" id="schedule-date-title">Today</div></div><div id="schedule-list"></div></div>
+    </div>
+    <div class="page" id="page-quotes">
+      <div class="card" style="padding:0"><table><thead><tr><th>Quote #</th><th>Customer</th><th>Description</th><th>Amount</th><th>Status</th><th>Created</th><th></th></tr></thead><tbody id="quotes-table"></tbody></table></div>
+    </div>
+  </div>
+</div>
+<div class="ai-panel" id="ai-panel">
+  <div class="ai-header">
+    <div class="ai-title"><span style="font-size:18px">&#129302;</span><div><div>FlowPro AI Agent</div><div style="font-size:10px;color:var(--accent3);font-weight:600;letter-spacing:0.5px">&#9679; Online</div></div></div>
+    <button class="modal-close" onclick="toggleAI()">&#x2715;</button>
+  </div>
+  <div class="ai-messages" id="ai-messages">
+    <div class="msg assistant"><div class="msg-label">AI Agent</div><div class="msg-bubble">&#128075; G'day! I'm your FlowPro AI agent. I can help you manage jobs, assign technicians, generate quotes, organise your schedule, and track your team. What do you need?</div></div>
+  </div>
+  <div class="ai-input-area">
+    <div class="ai-suggestions">
+      <div class="ai-suggestion" onclick="sendSuggestion(this)">Who's available now?</div>
+      <div class="ai-suggestion" onclick="sendSuggestion(this)">Generate a quote</div>
+      <div class="ai-suggestion" onclick="sendSuggestion(this)">Assign unassigned jobs</div>
+      <div class="ai-suggestion" onclick="sendSuggestion(this)">Summarise today</div>
+    </div>
+    <div class="ai-input-row">
+      <textarea class="ai-input" id="ai-input" rows="1" placeholder="Ask anything..." onkeydown="handleAIKey(event)"></textarea>
+      <button class="ai-send" onclick="sendAIMessage()">&#10148;</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="main-modal">
+  <div class="modal" id="main-modal-box">
+    <div class="modal-header"><div class="modal-title" id="modal-title">New Job</div><button class="modal-close" onclick="closeModal()">&#x2715;</button></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+<div class="modal-overlay" id="cust-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">Customer Profile</div><button class="modal-close" onclick="document.getElementById('cust-modal').classList.remove('open')">&#x2715;</button></div>
+    <div class="modal-body" id="cust-modal-body"></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="document.getElementById('cust-modal').classList.remove('open')">Close</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="job-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title" id="job-modal-title">Job Details</div><button class="modal-close" onclick="document.getElementById('job-modal').classList.remove('open')">&#x2715;</button></div>
+    <div class="modal-body" id="job-modal-body"></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="document.getElementById('job-modal').classList.remove('open')">Close</button><button class="btn btn-primary" onclick="saveJobEdit()">Save Changes</button></div>
+  </div>
+</div>
+<div class="save-toast" id="save-toast">&#x2713; Saved</div>
+<script>
+const DEFAULT_JOBS=[
+  {id:1001,description:'Burst pipe repair',address:'14 Oak St, Richmond',customer:'Sandra Lee',tech:'Mike Chen',status:'active',date:'2026-06-02',priority:'high',notes:[{text:'Customer is at work, key under mat',time:'9:00 AM'}]},
+  {id:1002,description:'Hot water system install',address:'7 Maple Ave, Hawthorn',customer:'Tom Richards',tech:'Sarah Kim',status:'active',date:'2026-06-02',priority:'medium',notes:[]},
+  {id:1003,description:'Drain blockage',address:'22 Pine Rd, Brunswick',customer:'Amy Chen',tech:'',status:'pending',date:'2026-06-02',priority:'medium',notes:[{text:'Customer said it has been slow for 2 weeks',time:'8:30 AM'}]},
+  {id:1004,description:'Tap replacement',address:'5 Elm Ct, Fitzroy',customer:'James Wilson',tech:'Dave Torres',status:'scheduled',date:'2026-06-02',priority:'low',notes:[]},
+  {id:1005,description:'Bathroom refit',address:'88 Bridge Rd, Collingwood',customer:'Lucy Park',tech:'',status:'pending',date:'2026-06-03',priority:'high',notes:[]},
+];
+const DEFAULT_CUSTOMERS=[
+  {id:'c1',name:'Sandra Lee',phone:'0412 345 678',email:'sandra@email.com',address:'14 Oak St, Richmond',notes:'Prefers morning appointments'},
+  {id:'c2',name:'Tom Richards',phone:'0423 456 789',email:'tom.r@email.com',address:'7 Maple Ave, Hawthorn',notes:''},
+  {id:'c3',name:'Amy Chen',phone:'0434 567 890',email:'amy.chen@email.com',address:'22 Pine Rd, Brunswick',notes:'Has a dog, call before arriving'},
+  {id:'c4',name:'James Wilson',phone:'0445 678 901',email:'jwilson@email.com',address:'5 Elm Ct, Fitzroy',notes:'Long-term client, priority service'},
+  {id:'c5',name:'Lucy Park',phone:'0456 789 012',email:'lucy.p@email.com',address:'88 Bridge Rd, Collingwood',notes:''},
+];
+const DEFAULT_TECHS=[
+  {id:'t1',name:'Mike Chen',initials:'MC',phone:'0400 111 222',status:'on-site',currentJob:'Burst pipe - 14 Oak St',jobsToday:2,skills:'Emergency, Repairs',color:'#2ea8ff'},
+  {id:'t2',name:'Sarah Kim',initials:'SK',phone:'0400 222 333',status:'on-site',currentJob:'Hot water - 7 Maple Ave',jobsToday:2,skills:'Installations, Gas Fitting',color:'#56d364'},
+  {id:'t3',name:'Dave Torres',initials:'DT',phone:'0400 333 444',status:'en-route',currentJob:'Tap replacement - 5 Elm Ct',jobsToday:1,skills:'General, Repairs',color:'#e3b341'},
+];
+const DEFAULT_QUOTES=[
+  {id:'Q-001',customer:'James Wilson',description:'Bathroom refit quote',amount:1850,status:'sent',created:'2026-06-02'},
+  {id:'Q-002',customer:'Amy Chen',description:'Drain camera inspection + clear',amount:420,status:'pending',created:'2026-06-01'},
+  {id:'Q-003',customer:'Lucy Park',description:'Full bathroom refit',amount:4200,status:'draft',created:'2026-05-31'},
+];
+const DEFAULT_ACTIVITY=[
+  {icon:'\u2705',iconBg:'rgba(86,211,100,0.15)',text:'<strong>Job #1042 completed</strong> — Blocked drain at 3 River St by Mike Chen',time:'8:45 AM today'},
+  {icon:'\ud83d\udccb',iconBg:'rgba(46,168,255,0.15)',text:'<strong>New quote sent</strong> — Bathroom refit for James Wilson · $1,850',time:'8:10 AM today'},
+  {icon:'\ud83d\udea8',iconBg:'rgba(247,129,102,0.15)',text:'<strong>Emergency job booked</strong> — Burst pipe at 14 Oak St · Sandra Lee',time:'Yesterday 11:55 PM'},
+];
+function load(k,d){try{const v=localStorage.getItem('fp_'+k);return v?JSON.parse(v):d;}catch(e){return d;}}
+function save(k,v){try{localStorage.setItem('fp_'+k,JSON.stringify(v));}catch(e){}showToast();}
+function showToast(){const t=document.getElementById('save-toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);}
+let jobs=load('jobs',DEFAULT_JOBS);
+let customers=load('customers',DEFAULT_CUSTOMERS);
+let technicians=load('techs',DEFAULT_TECHS);
+let quotes=load('quotes',DEFAULT_QUOTES);
+let activity=load('activity',DEFAULT_ACTIVITY);
+function saveAll(){save('jobs',jobs);save('customers',customers);save('techs',technicians);save('quotes',quotes);save('activity',activity);}
+let currentPage='dashboard';
+let sChart=null,pChart=null;
+function showPage(page,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(el)el.classList.add('active');
+  currentPage=page;
+  const titles={dashboard:'Dashboard',jobs:'Jobs',customers:'Customers',technicians:'Technicians',schedule:'Schedule',quotes:'Quotes'};
+  document.getElementById('page-title').textContent=titles[page];
+  const btns={jobs:'+ New Job',customers:'+ New Customer',technicians:'+ Add Technician',quotes:'+ New Quote',dashboard:'+ New Job',schedule:'+ New Job'};
+  document.getElementById('add-btn').textContent=btns[page]||'+ New';
+  renderPage(page);
+}
+function renderPage(p){
+  if(p==='dashboard')renderDashboard();
+  if(p==='jobs')renderJobs();
+  if(p==='customers')renderCustomers();
+  if(p==='technicians')renderTechnicians();
+  if(p==='schedule')renderSchedule();
+  if(p==='quotes')renderQuotes();
+}
+function fmtDate(d){if(!d)return '—';try{return new Date(d).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});}catch(e){return d;}}
+function today(){return new Date().toISOString().split('T')[0];}
+function statusBadge(s){const m={active:'badge-green',scheduled:'badge-blue',pending:'badge-yellow',completed:'badge-grey',sent:'badge-green',draft:'badge-yellow',approved:'badge-green'};return '<span class="badge '+(m[s]||'badge-blue')+'">'+s+'</span>';}
+function priTag(p){const m={high:'#f78166',medium:'#e3b341',low:'#56d364'};return '<span style="color:'+(m[p]||'#8b949e')+';font-size:12px;font-weight:600">\u25cf '+p+'</span>';}
+function techStatusLabel(s){return s==='on-site'?'\ud83d\udd34 On-site':s==='en-route'?'\ud83d\udfe1 En route':'\ud83d\udfe2 Available';}
+function addActivity(icon,iconBg,text){const now=new Date();const time=now.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})+' today';activity.unshift({icon,iconBg,text,time});if(activity.length>20)activity.pop();save('activity',activity);}
+function getJobCount(n){return jobs.filter(j=>j.customer===n).length;}
+function getLastJob(n){const jj=jobs.filter(j=>j.customer===n).sort((a,b)=>b.date.localeCompare(a.date));return jj.length?fmtDate(jj[0].date):'—';}
+function updateJobsBadge(){document.getElementById('jobs-badge').textContent=jobs.filter(j=>j.status!=='completed').length;}
+function renderDashboard(){
+  const active=jobs.filter(j=>j.status==='active').length;
+  const todayJobs=jobs.filter(j=>j.date===today());
+  const completed=todayJobs.filter(j=>j.status==='completed').length;
+  const onSite=technicians.filter(t=>t.status==='on-site').length;
+  const available=technicians.filter(t=>t.status==='available').length;
+  const pendingQ=quotes.filter(q=>q.status!=='approved');
+  const pipeline=pendingQ.reduce((s,q)=>s+(q.amount||0),0);
+  document.getElementById('s-active').textContent=active;
+  document.getElementById('s-active-sub').textContent=active+' jobs in progress';
+  document.getElementById('s-today').textContent=todayJobs.length;
+  document.getElementById('s-today-sub').textContent=completed+' completed today';
+  document.getElementById('s-techs').textContent=onSite;
+  document.getElementById('s-techs-sub').textContent=available+' available';
+  document.getElementById('s-quotes').textContent=pendingQ.length;
+  document.getElementById('s-quotes-sub').textContent='$'+pipeline.toLocaleString()+' pipeline';
+  updateJobsBadge();
+  const sc={active:0,scheduled:0,pending:0,completed:0};
+  jobs.forEach(j=>{if(sc[j.status]!==undefined)sc[j.status]++;});
+  const pc={high:0,medium:0,low:0};
+  jobs.forEach(j=>{if(pc[j.priority]!==undefined)pc[j.priority]++;});
+  const opts=(labels,data,colors)=>({type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#161b22',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8b949e',font:{size:11},boxWidth:12}}},cutout:'65%'}});
+  if(sChart)sChart.destroy();if(pChart)pChart.destroy();
+  sChart=new Chart(document.getElementById('chart-status'),opts(['Active','Scheduled','Pending','Completed'],[sc.active,sc.scheduled,sc.pending,sc.completed],['#56d364','#2ea8ff','#e3b341','#484f58']));
+  pChart=new Chart(document.getElementById('chart-priority'),opts(['High','Medium','Low'],[pc.high,pc.medium,pc.low],['#f78166','#e3b341','#56d364']));
+  const liveJobs=jobs.filter(j=>j.status==='active'||j.status==='scheduled').slice(0,5);
+  document.getElementById('dash-jobs').innerHTML=liveJobs.length?liveJobs.map(j=>'<div class="job-item" style="cursor:pointer" onclick="openJobDetail('+j.id+')"><div class="job-dot '+j.status+'"></div><div class="job-info"><div class="job-name">'+j.description+'</div><div class="job-meta">'+(j.tech||'Unassigned')+' · '+j.address+'</div></div>'+priTag(j.priority)+'</div>').join(''):'<div style="color:var(--text2);font-size:13px;padding:12px 0">No active jobs</div>';
+  document.getElementById('dash-techs').innerHTML=technicians.map(t=>'<div class="tech-item"><div class="tech-avatar" style="background:rgba(46,168,255,0.15);color:'+t.color+'">'+t.initials+'</div><div class="tech-info"><div class="tech-name">'+t.name+'</div><div class="tech-job">'+techStatusLabel(t.status)+' · '+(t.currentJob||'No job')+'</div></div></div>').join('');
+  document.getElementById('dash-activity').innerHTML=activity.slice(0,5).map(a=>'<div class="activity-item"><div class="activity-icon" style="background:'+a.iconBg+'">'+a.icon+'</div><div class="activity-content"><div class="activity-text">'+a.text+'</div><div class="activity-time">'+a.time+'</div></div></div>').join('');
+}
+function renderJobs(){
+  const q=(document.getElementById('job-search')||{}).value||'';
+  const sf=(document.getElementById('job-status-filter')||{}).value||'';
+  const pf=(document.getElementById('job-priority-filter')||{}).value||'';
+  let list=jobs;
+  if(q)list=list.filter(j=>[j.description,j.customer,j.address,j.tech].join(' ').toLowerCase().includes(q.toLowerCase()));
+  if(sf)list=list.filter(j=>j.status===sf);
+  if(pf)list=list.filter(j=>j.priority===pf);
+  document.getElementById('jobs-table').innerHTML=list.length?list.map(j=>'<tr class="clickable-row" onclick="openJobDetail('+j.id+')"><td><strong>'+j.description+'</strong><br><span style="color:var(--text2);font-size:11px">'+j.address+'</span></td><td>'+j.customer+'</td><td>'+(j.tech||'<span style="color:var(--warning)">Unassigned</span>')+'</td><td>'+statusBadge(j.status)+'</td><td>'+priTag(j.priority)+'</td><td style="color:var(--text2);font-size:12px">'+fmtDate(j.date)+'</td><td><span class="badge badge-grey">'+((j.notes||[]).length)+' note'+((j.notes||[]).length===1?'':'s')+'</span></td><td onclick="event.stopPropagation()"><button class="btn btn-danger btn-sm" onclick="deleteJob('+j.id+')">Delete</button></td></tr>').join(''):'<tr><td colspan="8" style="text-align:center;color:var(--text2);padding:32px">No jobs found</td></tr>';
+}
+function deleteJob(id){if(!confirm('Delete this job?'))return;jobs=jobs.filter(j=>j.id!==id);save('jobs',jobs);renderPage(currentPage);}
+let editingJobId=null;
+function openJobDetail(id){
+  editingJobId=id;
+  const j=jobs.find(j=>j.id===id);if(!j)return;
+  const techOptions=technicians.map(t=>'<option '+(t.name===j.tech?'selected':'')+'>'+t.name+'</option>').join('');
+  document.getElementById('job-modal-title').textContent='Job #'+j.id+' — '+j.description;
+  document.getElementById('job-modal-body').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="form-group"><label>Description</label><input id="jd-desc" value="'+j.description+'"></div><div class="form-group"><label>Address</label><input id="jd-addr" value="'+j.address+'"></div><div class="form-group"><label>Customer</label><input id="jd-cust" value="'+j.customer+'"></div><div class="form-group"><label>Technician</label><select id="jd-tech"><option value="">--- Unassigned</option>'+techOptions+'</select></div><div class="form-group"><label>Status</label><select id="jd-status">'+['pending','scheduled','active','completed'].map(s=>'<option '+(s===j.status?'selected':'')+'>'+s+'</option>').join('')+'</select></div><div class="form-group"><label>Priority</label><select id="jd-priority">'+['high','medium','low'].map(p=>'<option '+(p===j.priority?'selected':'')+'>'+p+'</option>').join('')+'</select></div><div class="form-group"><label>Date</label><input type="date" id="jd-date" value="'+j.date+'"></div></div><div class="notes-section"><div class="card-title" style="margin-bottom:12px">&#128221; Job Notes</div><div id="jd-notes-list">'+((j.notes||[]).length?(j.notes||[]).map(n=>'<div class="note-item"><div class="note-meta">'+n.time+'</div><div class="note-text">'+n.text+'</div></div>').join(''):'<div style="color:var(--text2);font-size:13px">No notes yet</div>')+'</div><div class="note-input-row"><input class="note-input" id="jd-note-input" placeholder="Add a note..."><button class="btn btn-primary btn-sm" onclick="addJobNote('+id+')">Add</button></div></div>';
+  document.getElementById('job-modal').classList.add('open');
+}
+function addJobNote(id){
+  const input=document.getElementById('jd-note-input');
+  const text=input.value.trim();if(!text)return;
+  const j=jobs.find(j=>j.id===id);if(!j)return;
+  if(!j.notes)j.notes=[];
+  const now=new Date();
+  const time=now.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})+' · '+now.toLocaleDateString('en-AU');
+  j.notes.push({text,time});
+  save('jobs',jobs);input.value='';
+  document.getElementById('jd-notes-list').innerHTML=j.notes.map(n=>'<div class="note-item"><div class="note-meta">'+n.time+'</div><div class="note-text">'+n.text+'</div></div>').join('');
+}
+function saveJobEdit(){
+  const j=jobs.find(j=>j.id===editingJobId);if(!j)return;
+  j.description=document.getElementById('jd-desc').value||j.description;
+  j.address=document.getElementById('jd-addr').value||j.address;
+  j.customer=document.getElementById('jd-cust').value||j.customer;
+  j.tech=document.getElementById('jd-tech').value;
+  j.status=document.getElementById('jd-status').value;
+  j.priority=document.getElementById('jd-priority').value;
+  j.date=document.getElementById('jd-date').value||j.date;
+  save('jobs',jobs);
+  document.getElementById('job-modal').classList.remove('open');
+  renderPage(currentPage);
+  addActivity('\u270f\ufe0f','rgba(46,168,255,0.15)','<strong>Job #'+j.id+' updated</strong> — '+j.description+' · '+j.status);
+}
+function renderCustomers(){
+  const q=(document.getElementById('cust-search')||{}).value||'';
+  let list=customers;
+  if(q)list=list.filter(c=>[c.name,c.phone,c.email,c.address].join(' ').toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('customers-table').innerHTML=list.length?list.map(c=>'<tr class="clickable-row" onclick="openCustomerDetail(\''+c.id+'\')"><td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:rgba(46,168,255,0.15);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">'+c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)+'</div><strong>'+c.name+'</strong></div></td><td style="font-family:'DM Mono',monospace;font-size:12px">'+(c.phone||'—')+'</td><td style="color:var(--text2);font-size:12px">'+(c.email||'—')+'</td><td style="color:var(--text2)">'+(c.address||'—')+'</td><td><span class="badge badge-blue">'+getJobCount(c.name)+' jobs</span></td><td style="color:var(--text2);font-size:12px">'+getLastJob(c.name)+'</td><td onclick="event.stopPropagation()"><button class="btn btn-danger btn-sm" onclick="deleteCustomer(\''+c.id+'\')">Delete</button></td></tr>').join(''):'<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:32px">No customers found</td></tr>';
+}
+function deleteCustomer(id){if(!confirm('Delete this customer?'))return;customers=customers.filter(c=>c.id!==id);save('customers',customers);renderCustomers();}
+function openCustomerDetail(id){
+  const c=customers.find(c=>c.id===id);if(!c)return;
+  const custJobs=jobs.filter(j=>j.customer===c.name);
+  document.getElementById('cust-modal-body').innerHTML='<div class="customer-hero"><div class="customer-avatar-lg">'+c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)+'</div><div><div class="customer-name-lg">'+c.name+'</div><div class="customer-meta-lg">'+(c.email||'')+' '+(c.phone?'· '+c.phone:'')+'</div><div class="customer-meta-lg" style="margin-top:2px">'+(c.address||'')+'</div></div></div>'+(c.notes?'<div style="background:rgba(46,168,255,0.07);border:1px solid rgba(46,168,255,0.2);border-radius:8px;padding:12px;margin-bottom:20px;font-size:13px;color:var(--text2)">&#128204; '+c.notes+'</div>':'')+'<div class="card-title" style="margin-bottom:12px">Job History ('+custJobs.length+')</div>'+(custJobs.length?'<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden"><table><thead><tr><th>Job</th><th>Status</th><th>Technician</th><th>Date</th><th>Notes</th></tr></thead><tbody>'+custJobs.map(j=>'<tr style="cursor:pointer" onclick="document.getElementById('cust-modal').classList.remove('open');openJobDetail('+j.id+')"><td><strong>'+j.description+'</strong><br><span style="color:var(--text2);font-size:11px">'+j.address+'</span></td><td>'+statusBadge(j.status)+'</td><td>'+(j.tech||'Unassigned')+'</td><td style="color:var(--text2);font-size:12px">'+fmtDate(j.date)+'</td><td><span class="badge badge-grey">'+((j.notes||[]).length)+'</span></td></tr>').join('')+'</tbody></table></div>':'<div style="color:var(--text2);font-size:13px">No jobs for this customer yet.</div>');
+  document.getElementById('cust-modal').classList.add('open');
+}
+function renderTechnicians(){
+  document.getElementById('techs-table').innerHTML=technicians.map(t=>{
+    const sc=t.status==='on-site'?'var(--accent3)':t.status==='en-route'?'var(--warning)':'var(--text2)';
+    return '<tr><td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:rgba(46,168,255,0.15);color:'+t.color+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">'+t.initials+'</div><strong>'+t.name+'</strong></div></td><td style="font-family:'DM Mono',monospace;font-size:12px">'+t.phone+'</td><td><select onchange="updateTechStatus(''+t.id+'',this.value)" style="width:auto;background:transparent;border:none;color:'+sc+';font-weight:600;font-size:12px;cursor:pointer;padding:2px"><option '+(t.status==='available'?'selected':'')+' value="available">&#128994; Available</option><option '+(t.status==='en-route'?'selected':'')+' value="en-route">&#128993; En route</option><option '+(t.status==='on-site'?'selected':'')+' value="on-site">&#128308; On-site</option></select></td><td style="color:var(--text2);font-size:12px">'+(t.currentJob||'—')+'</td><td><span class="badge badge-blue">'+t.jobsToday+'</span></td><td style="color:var(--text2);font-size:12px">'+t.skills+'</td><td><button class="btn btn-danger btn-sm" onclick="deleteTech(''+t.id+'')">Remove</button></td></tr>';
+  }).join('');
+}
+function updateTechStatus(id,status){const t=technicians.find(t=>t.id===id);if(t){t.status=status;save('techs',technicians);}}
+function deleteTech(id){if(!confirm('Remove this technician?'))return;technicians=technicians.filter(t=>t.id!==id);save('techs',technicians);renderTechnicians();}
+function renderSchedule(){
+  const d=new Date();
+  document.getElementById('schedule-date-title').textContent='Today — '+d.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const todayJobs=jobs.filter(j=>j.date===today()).sort((a,b)=>{const o={active:0,scheduled:1,pending:2,completed:3};return(o[a.status]||99)-(o[b.status]||99);});
+  document.getElementById('schedule-list').innerHTML=todayJobs.length?todayJobs.map(j=>'<div class="job-item" style="padding:14px 0;cursor:pointer" onclick="openJobDetail('+j.id+')"><div class="job-dot '+j.status+'" style="flex-shrink:0"></div><div class="job-info"><div class="job-name">'+j.description+' — '+j.address+'</div><div class="job-meta">'+(j.tech||'Unassigned')+' · '+j.customer+'</div></div><div style="display:flex;gap:8px;align-items:center">'+statusBadge(j.status)+priTag(j.priority)+'</div></div>').join(''):'<div style="color:var(--text2);font-size:13px;padding:20px 0;text-align:center">No jobs scheduled for today</div>';
+}
+function renderQuotes(){
+  document.getElementById('quotes-table').innerHTML=quotes.length?quotes.map(q=>'<tr><td style="font-family:'DM Mono',monospace;color:var(--accent)">'+q.id+'</td><td><strong>'+q.customer+'</strong></td><td style="color:var(--text2)">'+q.description+'</td><td style="font-weight:700;color:var(--accent3)">$'+((q.amount||0).toLocaleString())+'</td><td>'+statusBadge(q.status)+'</td><td style="color:var(--text2);font-size:12px">'+fmtDate(q.created)+'</td><td><button class="btn btn-danger btn-sm" onclick="deleteQuote(''+q.id+'')">Delete</button></td></tr>').join(''):'<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:32px">No quotes yet</td></tr>';
+}
+function deleteQuote(id){if(!confirm('Delete this quote?'))return;quotes=quotes.filter(q=>q.id!==id);save('quotes',quotes);renderQuotes();}
+let modalMode='job';
+function openAddModal(){
+  modalMode=currentPage==='customers'?'customer':currentPage==='technicians'?'tech':currentPage==='quotes'?'quote':'job';
+  const techOpts=technicians.map(t=>'<option>'+t.name+'</option>').join('');
+  const custOpts=customers.map(c=>'<option>'+c.name+'</option>').join('');
+  const forms={
+    job:'<div class="form-row"><div class="form-group"><label>Description</label><input id="f-desc" placeholder="e.g. Burst pipe repair"></div><div class="form-group"><label>Customer</label><select id="f-customer"><option value="">-- Select</option>'+custOpts+'</select></div></div><div class="form-group"><label>Address</label><input id="f-address" placeholder="Job site address"></div><div class="form-row"><div class="form-group"><label>Technician</label><select id="f-tech"><option value="">-- Unassigned</option>'+techOpts+'</select></div><div class="form-group"><label>Date</label><input type="date" id="f-date" value="'+today()+'"></div></div><div class="form-row"><div class="form-group"><label>Priority</label><select id="f-priority"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select></div><div class="form-group"><label>Status</label><select id="f-status"><option value="pending">Pending</option><option value="scheduled">Scheduled</option><option value="active">Active</option></select></div></div><div class="form-group"><label>Initial Note (optional)</label><textarea id="f-note" placeholder="Any notes..."></textarea></div>',
+    customer:'<div class="form-row"><div class="form-group"><label>Full Name</label><input id="f-name" placeholder="Customer name"></div><div class="form-group"><label>Phone</label><input id="f-phone" placeholder="04XX XXX XXX"></div></div><div class="form-group"><label>Email</label><input id="f-email" type="email" placeholder="customer@email.com"></div><div class="form-group"><label>Address</label><input id="f-addr" placeholder="Full address"></div><div class="form-group"><label>Notes</label><textarea id="f-cnotes" placeholder="Any special notes..."></textarea></div>',
+    tech:'<div class="form-row"><div class="form-group"><label>Full Name</label><input id="f-tname" placeholder="Technician name"></div><div class="form-group"><label>Phone</label><input id="f-tphone" placeholder="04XX XXX XXX"></div></div><div class="form-group"><label>Skills</label><input id="f-skills" placeholder="e.g. Emergency, Gas Fitting"></div>',
+    quote:'<div class="form-row"><div class="form-group"><label>Customer</label><select id="f-qcust"><option value="">-- Select</option>'+custOpts+'</select></div><div class="form-group"><label>Amount ($)</label><input id="f-qamt" type="number" placeholder="e.g. 1200"></div></div><div class="form-group"><label>Description</label><textarea id="f-qdesc" placeholder="Scope of work..."></textarea></div><div class="form-group"><label>Status</label><select id="f-qstatus"><option value="draft">Draft</option><option value="pending">Pending</option><option value="sent">Sent</option></select></div>',
+  };
+  const titles={job:'New Job',customer:'New Customer',tech:'Add Technician',quote:'New Quote'};
+  document.getElementById('modal-title').textContent=titles[modalMode];
+  document.getElementById('modal-body').innerHTML=forms[modalMode];
+  document.getElementById('modal-footer').innerHTML='<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveRecord()">Save</button>';
+  document.getElementById('main-modal').classList.add('open');
+}
+function closeModal(){document.getElementById('main-modal').classList.remove('open');}
+function saveRecord(){
+  if(modalMode==='job'){
+    const desc=document.getElementById('f-desc').value||'New Job';
+    const customer=document.getElementById('f-customer').value||'Unknown';
+    const address=document.getElementById('f-address').value||'';
+    const tech=document.getElementById('f-tech').value;
+    const priority=document.getElementById('f-priority').value;
+    const status=document.getElementById('f-status').value;
+    const date=document.getElementById('f-date').value||today();
+    const note=document.getElementById('f-note').value.trim();
+    const notes=note?[{text:note,time:'Created · '+new Date().toLocaleDateString('en-AU')}]:[];
+    jobs.push({id:Date.now(),description:desc,address,customer,tech,status,date,priority,notes});
+    addActivity('&#128297;','rgba(46,168,255,0.15)','<strong>New job created</strong> — '+desc+' · '+customer);
+  }else if(modalMode==='customer'){
+    const name=document.getElementById('f-name').value||'New Customer';
+    customers.push({id:'c'+Date.now(),name,phone:document.getElementById('f-phone').value||'',email:document.getElementById('f-email').value||'',address:document.getElementById('f-addr').value||'',notes:document.getElementById('f-cnotes').value||''});
+    addActivity('&#128101;','rgba(86,211,100,0.15)','<strong>New customer added</strong> — '+name);
+  }else if(modalMode==='tech'){
+    const name=document.getElementById('f-tname').value||'New Tech';
+    const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const colors=['#2ea8ff','#56d364','#e3b341','#f78166','#a371f7'];
+    technicians.push({id:'t'+Date.now(),name,initials,phone:document.getElementById('f-tphone').value||'',status:'available',currentJob:'',jobsToday:0,skills:document.getElementById('f-skills').value||'General',color:colors[technicians.length%colors.length]});
+    addActivity('&#128119;','rgba(227,179,65,0.15)','<strong>Technician added</strong> — '+name);
+  }else if(modalMode==='quote'){
+    const customer=document.getElementById('f-qcust').value||'Unknown';
+    const description=document.getElementById('f-qdesc').value||'Quote';
+    const amount=parseFloat(document.getElementById('f-qamt').value)||0;
+    const status=document.getElementById('f-qstatus').value;
+    const id='Q-'+String(quotes.length+1).padStart(3,'0');
+    quotes.push({id,customer,description,amount,status,created:today()});
+    addActivity('&#128176;','rgba(86,211,100,0.15)','<strong>New quote created</strong> — '+description+' · $'+amount.toLocaleString()+' for '+customer);
+  }
+  saveAll();closeModal();renderPage(currentPage);
+}
+let aiOpen=false,aiHistory=[];
+function buildSP(){
+  const aJ=jobs.filter(j=>j.status!=='completed');
+  const uJ=jobs.filter(j=>!j.tech&&j.status!=='completed');
+  const aT=technicians.filter(t=>t.status==='available');
+  return 'You are FlowPro AI, the intelligent operations agent for a Melbourne-based plumbing company CRM.\n\nLIVE DATA:\nActive Jobs ('+aJ.length+' total, '+uJ.length+' unassigned):\n'+aJ.map(j=>'- #'+j.id+': '+j.description+' at '+j.address+' - Customer: '+j.customer+' - Tech: '+(j.tech||'UNASSIGNED')+' - Status: '+j.status+' - Priority: '+j.priority).join('\n')+'\n\nTechnicians ('+technicians.length+' total, '+aT.length+' available):\n'+technicians.map(t=>'- '+t.name+': '+t.status+' - Current: '+(t.currentJob||'none')+' - Skills: '+t.skills).join('\n')+'\n\nCustomers: '+customers.map(c=>c.name).join(', ')+'\n\nQuotes pipeline: '+quotes.filter(q=>q.status!==\'approved\').length+' open totalling $'+quotes.filter(q=>q.status!==\'approved\').reduce((s,q)=>s+(q.amount||0),0).toLocaleString()+'\n\nBe concise and practical. Use bullet points. Prices in AUD. You talk to the business owner/manager. Plumbing labour rates ~$120-180/hr + GST.';
+}
+function toggleAI(){aiOpen=!aiOpen;document.getElementById('ai-panel').classList.toggle('open',aiOpen);}
+function handleAIKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAIMessage();}}
+function sendSuggestion(el){document.getElementById('ai-input').value=el.textContent;sendAIMessage();}
+async function sendAIMessage(){
+  const input=document.getElementById('ai-input');
+  const text=input.value.trim();if(!text)return;
+  input.value='';appendMsg('user',text);aiHistory.push({role:'user',content:text});
+  const tid=appendTyping();
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'YOUR_API_KEY_HERE','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:buildSP(),messages:aiHistory})});
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'Sorry, I had trouble with that.';
+    removeTyping(tid);appendMsg('assistant',reply);aiHistory.push({role:'assistant',content:reply});
+  }catch(e){removeTyping(tid);appendMsg('assistant','\u26a0\ufe0f Could not reach the AI. Add your API key to enable this feature.');}
+}
+function appendMsg(role,text){
+  const msgs=document.getElementById('ai-messages');
+  const div=document.createElement('div');div.className='msg '+role;
+  const f=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  div.innerHTML='<div class="msg-label">'+(role==='user'?'You':'AI Agent')+'</div><div class="msg-bubble">'+f+'</div>';
+  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+function appendTyping(){const msgs=document.getElementById('ai-messages');const id='t'+Date.now();const div=document.createElement('div');div.id=id;div.className='msg assistant';div.innerHTML='<div class="msg-label">AI Agent</div><div class="msg-bubble" style="padding:8px 14px"><div class="typing"><span></span><span></span><span></span></div></div>';msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;return id;}
+function removeTyping(id){const el=document.getElementById(id);if(el)el.remove();}
+updateJobsBadge();renderDashboard();
+<\/script>
+</body>
+</html>
