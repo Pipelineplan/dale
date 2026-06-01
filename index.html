@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowPro CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--sf:#161b22;--sf2:#21262d;--bd:#30363d;--ac:#2ea8ff;--ac2:#f78166;--ac3:#56d364;--tx:#e6edf3;--tx2:#8b949e;--tx3:#484f58;--warn:#e3b341;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);height:100vh;display:flex;overflow:hidden;font-size:13px;}
+.sb{width:210px;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;}
+.logo{padding:16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:9px;}
+.logo-ic{width:32px;height:32px;background:var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.logo-tx{font-size:15px;font-weight:700;letter-spacing:-0.3px;}
+.logo-sub{font-size:9px;color:var(--tx2);letter-spacing:1px;text-transform:uppercase;}
+nav{padding:10px 7px;flex:1;}
+.ns{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--tx3);padding:8px 7px 3px;}
+.ni{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:6px;cursor:pointer;color:var(--tx2);font-size:12px;font-weight:500;margin-bottom:1px;transition:all 0.12s;}
+.ni:hover{background:var(--sf2);color:var(--tx);}
+.ni.on{background:rgba(46,168,255,0.12);color:var(--ac);}
+.nb{margin-left:auto;background:var(--ac2);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;}
+.sb-bot{padding:10px 7px;border-top:1px solid var(--bd);}
+.aibtn{display:flex;align-items:center;gap:8px;padding:8px 9px;background:rgba(46,168,255,0.08);border:1px solid rgba(46,168,255,0.2);border-radius:6px;cursor:pointer;transition:all 0.12s;}
+.aibtn:hover{background:rgba(46,168,255,0.15);}
+.aidot{width:7px;height:7px;background:var(--ac3);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{padding:13px 22px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:var(--sf);}
+.ptitle{font-size:17px;font-weight:700;}
+.tacts{display:flex;gap:7px;}
+.btn{padding:6px 13px;border-radius:6px;border:none;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;transition:all 0.12s;}
+.bp{background:var(--ac);color:#000;}.bp:hover{background:#5bbeff;}
+.bg{background:transparent;color:var(--tx2);border:1px solid var(--bd);}.bg:hover{background:var(--sf2);}
+.bdr{background:rgba(247,129,102,0.12);color:var(--ac2);border:1px solid rgba(247,129,102,0.25);}
+.bsm{padding:3px 9px;font-size:11px;}
+.content{flex:1;overflow-y:auto;padding:20px;}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:9px;padding:16px;}
+.sl{font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--tx2);margin-bottom:8px;font-weight:600;}
+.sv{font-size:26px;font-weight:700;letter-spacing:-1px;}
+.bl{color:var(--ac);}.gr{color:var(--ac3);}.or{color:var(--ac2);}.ye{color:var(--warn);}
+.sch{font-size:11px;color:var(--tx2);margin-top:3px;}
+.t2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:9px;padding:16px;margin-bottom:14px;}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;}
+.ct2{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--tx2);}
+.ji{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);}
+.ji:last-child{border-bottom:none;}
+.jd{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.jd.active{background:var(--ac3);box-shadow:0 0 5px var(--ac3);}
+.jd.pending{background:var(--warn);}
+.jd.scheduled{background:var(--ac);}
+.jd.completed{background:var(--tx3);}
+.ji-info{flex:1;min-width:0;}
+.jn{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.jm{font-size:10px;color:var(--tx2);margin-top:1px;}
+.bdg{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:700;text-transform:uppercase;}
+.bg2{background:rgba(86,211,100,0.15);color:var(--ac3);}
+.bb{background:rgba(46,168,255,0.15);color:var(--ac);}
+.by{background:rgba(227,179,65,0.15);color:var(--warn);}
+.bgr{background:rgba(139,148,158,0.15);color:var(--tx2);}
+.page{display:none;}.page.on{display:block;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.7px;color:var(--tx2);font-weight:600;padding:9px 11px;border-bottom:1px solid var(--bd);}
+td{padding:10px 11px;border-bottom:1px solid var(--bd);font-size:12px;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.cr{cursor:pointer;}.cr:hover td{background:rgba(46,168,255,0.04);}
+.aip{position:fixed;right:0;top:0;bottom:0;width:360px;background:var(--sf);border-left:1px solid var(--bd);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.25s;z-index:50;}
+.aip.open{transform:translateX(0);}
+.aih{padding:14px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;}
+.aim{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.msg{max-width:88%;}
+.msg.u{align-self:flex-end;}
+.msg.a{align-self:flex-start;}
+.mb2{padding:9px 12px;border-radius:9px;font-size:12px;line-height:1.5;}
+.msg.u .mb2{background:var(--ac);color:#000;font-weight:500;}
+.msg.a .mb2{background:var(--sf2);border:1px solid var(--bd);}
+.ml{font-size:9px;color:var(--tx3);margin-bottom:3px;font-weight:600;text-transform:uppercase;}
+.msg.u .ml{text-align:right;}
+.aia{padding:13px;border-top:1px solid var(--bd);}
+.aisr{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.ais{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:4px 9px;font-size:10px;cursor:pointer;color:var(--tx2);font-weight:500;}
+.ais:hover{border-color:var(--ac);color:var(--ac);}
+.airow{display:flex;gap:7px;}
+.aiinp{flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:8px 11px;color:var(--tx);font-family:inherit;font-size:12px;outline:none;resize:none;}
+.aiinp:focus{border-color:var(--ac);}
+.aisnd{background:var(--ac);border:none;border-radius:7px;width:36px;height:36px;cursor:pointer;color:#000;font-size:14px;flex-shrink:0;}
+.ty{display:flex;gap:3px;align-items:center;padding:9px 12px;}
+.ty span{width:5px;height:5px;background:var(--tx3);border-radius:50%;animation:bn 1.2s infinite;}
+.ty span:nth-child(2){animation-delay:0.2s;}
+.ty span:nth-child(3){animation-delay:0.4s;}
+@keyframes bn{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:none;align-items:center;justify-content:center;}
+.mo.open{display:flex;}
+.md{background:var(--sf);border:1px solid var(--bd);border-radius:11px;width:500px;max-height:85vh;overflow-y:auto;}
+.mdlg{width:640px;}
+.mh{padding:18px 22px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;}
+.mt2{font-size:15px;font-weight:700;}
+.mc{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:18px;line-height:1;}
+.mbody{padding:18px 22px;}
+.mfoo{padding:13px 22px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:7px;}
+.fg{margin-bottom:13px;}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+label{display:block;font-size:10px;font-weight:600;color:var(--tx2);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
+input,select,textarea{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:8px 10px;color:var(--tx);font-family:inherit;font-size:12px;outline:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--ac);}
+select option{background:var(--sf2);}
+textarea{resize:vertical;min-height:70px;}
+.nts{margin-top:16px;border-top:1px solid var(--bd);padding-top:14px;}
+.ni2{background:var(--sf2);border:1px solid var(--bd);border-radius:7px;padding:10px;margin-bottom:7px;}
+.nm{font-size:10px;color:var(--tx3);margin-bottom:4px;}
+.nt{font-size:12px;line-height:1.5;}
+.nrow{display:flex;gap:7px;margin-top:8px;}
+.ninp{flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:7px 10px;color:var(--tx);font-family:inherit;font-size:12px;outline:none;}
+.ninp:focus{border-color:var(--ac);}
+.chero{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--bd);}
+.cav{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;background:rgba(46,168,255,0.15);color:var(--ac);}
+.cnl{font-size:18px;font-weight:700;}
+.cml{font-size:12px;color:var(--tx2);margin-top:3px;}
+.sbar{display:flex;gap:9px;margin-bottom:14px;}
+.si{flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:8px 12px;color:var(--tx);font-family:inherit;font-size:12px;outline:none;}
+.si:focus{border-color:var(--ac);}
+.cwrap{position:relative;height:180px;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ac3);color:#000;padding:7px 16px;border-radius:16px;font-size:11px;font-weight:700;opacity:0;transition:opacity 0.3s;z-index:200;pointer-events:none;}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="sb">
+  <div class="logo">
+    <div class="logo-ic">&#128295;</div>
+    <div><div class="logo-tx">FlowPro</div><div class="logo-sub">CRM</div></div>
+  </div>
+  <nav>
+    <div class="ns">Main</div>
+    <div class="ni on" onclick="goPage('dashboard',this)"><span>&#128202;</span>Dashboard</div>
+    <div class="ni" onclick="goPage('jobs',this)"><span>&#128297;</span>Jobs<span class="nb" id="jbdg">0</span></div>
+    <div class="ni" onclick="goPage('customers',this)"><span>&#128101;</span>Customers</div>
+    <div class="ns">Team</div>
+    <div class="ni" onclick="goPage('technicians',this)"><span>&#128119;</span>Technicians</div>
+    <div class="ni" onclick="goPage('schedule',this)"><span>&#128197;</span>Schedule</div>
+    <div class="ns">Finance</div>
+    <div class="ni" onclick="goPage('quotes',this)"><span>&#128176;</span>Quotes</div>
+  </nav>
+  <div class="sb-bot">
+    <div class="aibtn" onclick="toggleAI()">
+      <div class="aidot"></div>
+      <span style="font-size:11px;font-weight:600;color:var(--ac)">AI Agent</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--tx2)">Open &#8594;</span>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="ptitle" id="ptitle">Dashboard</div>
+    <div class="tacts">
+      <button class="btn bg" onclick="toggleAI()">&#129302; Ask AI</button>
+      <button class="btn bp" id="addbtn" onclick="openAdd()">+ New Job</button>
+    </div>
+  </div>
+  <div class="content">
+
+    <div class="page on" id="pg-dashboard">
+      <div class="sgrid">
+        <div class="sc"><div class="sl">Active Jobs</div><div class="sv bl" id="s1">0</div><div class="sch" id="s1s">&nbsp;</div></div>
+        <div class="sc"><div class="sl">Jobs Today</div><div class="sv gr" id="s2">0</div><div class="sch" id="s2s">&nbsp;</div></div>
+        <div class="sc"><div class="sl">On-Site Techs</div><div class="sv ye" id="s3">0</div><div class="sch" id="s3s">&nbsp;</div></div>
+        <div class="sc"><div class="sl">Quotes Pipeline</div><div class="sv or" id="s4">0</div><div class="sch" id="s4s">&nbsp;</div></div>
+      </div>
+      <div class="t2">
+        <div class="card"><div class="ch"><div class="ct2">Jobs by Status</div></div><div class="cwrap"><canvas id="cst"></canvas></div></div>
+        <div class="card"><div class="ch"><div class="ct2">Jobs by Priority</div></div><div class="cwrap"><canvas id="cpr"></canvas></div></div>
+      </div>
+      <div class="t2">
+        <div class="card"><div class="ch"><div class="ct2">Live Jobs</div><span class="bdg bg2">&#9679; Live</span></div><div id="djobs"></div></div>
+        <div class="card"><div class="ch"><div class="ct2">Technicians</div></div><div id="dtechs"></div></div>
+      </div>
+      <div class="card"><div class="ch"><div class="ct2">Recent Activity</div></div><div id="dact"></div></div>
+    </div>
+
+    <div class="page" id="pg-jobs">
+      <div class="sbar">
+        <input class="si" id="jsrch" placeholder="Search jobs..." oninput="renderJobs()">
+        <select id="jsf" onchange="renderJobs()" style="width:auto;min-width:130px">
+          <option value="">All Status</option><option>active</option><option>scheduled</option><option>pending</option><option>completed</option>
+        </select>
+        <select id="jpf" onchange="renderJobs()" style="width:auto;min-width:120px">
+          <option value="">All Priority</option><option>high</option><option>medium</option><option>low</option>
+        </select>
+      </div>
+      <div class="card" style="padding:0">
+        <table><thead><tr><th>Job</th><th>Customer</th><th>Tech</th><th>Status</th><th>Priority</th><th>Date</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="jtbl"></tbody></table>
+      </div>
+    </div>
+
+    <div class="page" id="pg-customers">
+      <div class="sbar"><input class="si" id="csrch" placeholder="Search customers..." oninput="renderCustomers()"></div>
+      <div class="card" style="padding:0">
+        <table><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Address</th><th>Jobs</th><th>Last Job</th><th></th></tr></thead>
+        <tbody id="ctbl"></tbody></table>
+      </div>
+    </div>
+
+    <div class="page" id="pg-technicians">
+      <div class="card" style="padding:0">
+        <table><thead><tr><th>Technician</th><th>Phone</th><th>Status</th><th>Current Job</th><th>Today</th><th>Skills</th><th></th></tr></thead>
+        <tbody id="ttbl"></tbody></table>
+      </div>
+    </div>
+
+    <div class="page" id="pg-schedule">
+      <div class="card"><div class="ch"><div class="ct2" id="schdt">Today</div></div><div id="schl"></div></div>
+    </div>
+
+    <div class="page" id="pg-quotes">
+      <div class="card" style="padding:0">
+        <table><thead><tr><th>Quote #</th><th>Customer</th><th>Description</th><th>Amount</th><th>Status</th><th>Created</th><th></th></tr></thead>
+        <tbody id="qtbl"></tbody></table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- AI PANEL -->
+<div class="aip" id="aip">
+  <div class="aih">
+    <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700">
+      <span style="font-size:18px">&#129302;</span>
+      <div><div>FlowPro AI</div><div style="font-size:9px;color:var(--ac3);font-weight:600">&#9679; Online</div></div>
+    </div>
+    <button class="mc" onclick="toggleAI()">&#10005;</button>
+  </div>
+  <div class="aim" id="aim">
+    <div class="msg a"><div class="ml">AI Agent</div><div class="mb2">&#128075; G'day! I'm your FlowPro AI. Ask me to assign jobs, generate quotes, summarise your day, or anything about your business.</div></div>
+  </div>
+  <div class="aia">
+    <div class="aisr">
+      <div class="ais" onclick="sug(this)">Who's available?</div>
+      <div class="ais" onclick="sug(this)">Generate a quote</div>
+      <div class="ais" onclick="sug(this)">Assign unassigned jobs</div>
+      <div class="ais" onclick="sug(this)">Summarise today</div>
+    </div>
+    <div class="airow">
+      <textarea class="aiinp" id="aiinp" rows="1" placeholder="Ask anything..." onkeydown="aikey(event)"></textarea>
+      <button class="aisnd" onclick="sendAI()">&#10148;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="mo" id="mo1">
+  <div class="md">
+    <div class="mh"><div class="mt2" id="mo1t">New Job</div><button class="mc" onclick="closeMo()">&#10005;</button></div>
+    <div class="mbody" id="mo1b"></div>
+    <div class="mfoo" id="mo1f"></div>
+  </div>
+</div>
+
+<!-- JOB DETAIL MODAL -->
+<div class="mo" id="mo2">
+  <div class="md mdlg">
+    <div class="mh"><div class="mt2" id="mo2t">Job Details</div><button class="mc" onclick="closeMo2()">&#10005;</button></div>
+    <div class="mbody" id="mo2b"></div>
+    <div class="mfoo"><button class="btn bg" onclick="closeMo2()">Close</button><button class="btn bp" onclick="saveJob()">Save Changes</button></div>
+  </div>
+</div>
+
+<!-- CUSTOMER MODAL -->
+<div class="mo" id="mo3">
+  <div class="md mdlg">
+    <div class="mh"><div class="mt2">Customer Profile</div><button class="mc" onclick="closeMo3()">&#10005;</button></div>
+    <div class="mbody" id="mo3b"></div>
+    <div class="mfoo"><button class="btn bg" onclick="closeMo3()">Close</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">&#10003; Saved</div>
+
+<script>
+var DJ=[
+  {id:1001,desc:"Burst pipe repair",addr:"14 Oak St, Richmond",cust:"Sandra Lee",tech:"Mike Chen",status:"active",date:"2026-06-02",pri:"high",notes:[{t:"9:00 AM - 2 Jun",txt:"Key under mat, customer at work"}]},
+  {id:1002,desc:"Hot water system install",addr:"7 Maple Ave, Hawthorn",cust:"Tom Richards",tech:"Sarah Kim",status:"active",date:"2026-06-02",pri:"medium",notes:[]},
+  {id:1003,desc:"Drain blockage",addr:"22 Pine Rd, Brunswick",cust:"Amy Chen",tech:"",status:"pending",date:"2026-06-02",pri:"medium",notes:[{t:"8:30 AM - 2 Jun",txt:"Slow for 2 weeks, may need camera"}]},
+  {id:1004,desc:"Tap replacement",addr:"5 Elm Ct, Fitzroy",cust:"James Wilson",tech:"Dave Torres",status:"scheduled",date:"2026-06-02",pri:"low",notes:[]},
+  {id:1005,desc:"Bathroom refit",addr:"88 Bridge Rd, Collingwood",cust:"Lucy Park",tech:"",status:"pending",date:"2026-06-03",pri:"high",notes:[]}
+];
+var DC=[
+  {id:"c1",name:"Sandra Lee",phone:"0412 345 678",email:"sandra@email.com",addr:"14 Oak St, Richmond",note:"Prefers morning appointments"},
+  {id:"c2",name:"Tom Richards",phone:"0423 456 789",email:"tom.r@email.com",addr:"7 Maple Ave, Hawthorn",note:""},
+  {id:"c3",name:"Amy Chen",phone:"0434 567 890",email:"amy.chen@email.com",addr:"22 Pine Rd, Brunswick",note:"Has a dog - call before arriving"},
+  {id:"c4",name:"James Wilson",phone:"0445 678 901",email:"jwilson@email.com",addr:"5 Elm Ct, Fitzroy",note:"Long-term client, priority service"},
+  {id:"c5",name:"Lucy Park",phone:"0456 789 012",email:"lucy.p@email.com",addr:"88 Bridge Rd, Collingwood",note:""}
+];
+var DT=[
+  {id:"t1",name:"Mike Chen",ini:"MC",phone:"0400 111 222",status:"on-site",cur:"Burst pipe - 14 Oak St",today:2,skills:"Emergency, Repairs",col:"#2ea8ff"},
+  {id:"t2",name:"Sarah Kim",ini:"SK",phone:"0400 222 333",status:"on-site",cur:"Hot water - 7 Maple Ave",today:2,skills:"Installations, Gas",col:"#56d364"},
+  {id:"t3",name:"Dave Torres",ini:"DT",phone:"0400 333 444",status:"en-route",cur:"Tap replacement - 5 Elm Ct",today:1,skills:"General, Repairs",col:"#e3b341"}
+];
+var DQ=[
+  {id:"Q-001",cust:"James Wilson",desc:"Bathroom refit",amt:1850,status:"sent",created:"2026-06-02"},
+  {id:"Q-002",cust:"Amy Chen",desc:"Drain camera + clear",amt:420,status:"pending",created:"2026-06-01"},
+  {id:"Q-003",cust:"Lucy Park",desc:"Full bathroom refit",amt:4200,status:"draft",created:"2026-05-31"}
+];
+var DA=[
+  {ic:"&#9989;",bg:"rgba(86,211,100,0.15)",tx:"<strong>Job completed</strong> - Blocked drain - Mike Chen",tm:"8:45 AM today"},
+  {ic:"&#128203;",bg:"rgba(46,168,255,0.15)",tx:"<strong>Quote sent</strong> - Bathroom refit - James Wilson - $1,850",tm:"8:10 AM today"},
+  {ic:"&#128680;",bg:"rgba(247,129,102,0.15)",tx:"<strong>Emergency booked</strong> - Burst pipe - Sandra Lee",tm:"Yesterday 11:55 PM"}
+];
+
+function ld(k,d){try{var v=localStorage.getItem("fp_"+k);return v?JSON.parse(v):JSON.parse(JSON.stringify(d));}catch(e){return JSON.parse(JSON.stringify(d));}}
+function sv(k,v){try{localStorage.setItem("fp_"+k,JSON.stringify(v));}catch(e){}toast();}
+function toast(){var t=document.getElementById("toast");t.classList.add("show");setTimeout(function(){t.classList.remove("show");},1600);}
+
+var jobs=ld("jobs",DJ),custs=ld("custs",DC),techs=ld("techs",DT),quotes=ld("quotes",DQ),acts=ld("acts",DA);
+function svAll(){sv("jobs",jobs);sv("custs",custs);sv("techs",techs);sv("quotes",quotes);sv("acts",acts);}
+
+var curPage="dashboard",sc1=null,sc2=null,editJid=null,aiOpen=false,aiHist=[],mm="job";
+
+function goPage(p,el){
+  document.querySelectorAll(".page").forEach(function(x){x.classList.remove("on");});
+  document.querySelectorAll(".ni").forEach(function(x){x.classList.remove("on");});
+  document.getElementById("pg-"+p).classList.add("on");
+  if(el)el.classList.add("on");
+  curPage=p;
+  var tl={dashboard:"Dashboard",jobs:"Jobs",customers:"Customers",technicians:"Technicians",schedule:"Schedule",quotes:"Quotes"};
+  document.getElementById("ptitle").textContent=tl[p]||p;
+  var bl={jobs:"+ New Job",customers:"+ New Customer",technicians:"+ Add Technician",quotes:"+ New Quote",dashboard:"+ New Job",schedule:"+ New Job"};
+  document.getElementById("addbtn").textContent=bl[p]||"+ New";
+  rp(p);
+}
+function rp(p){
+  if(p==="dashboard")rdash();
+  else if(p==="jobs")renderJobs();
+  else if(p==="customers")renderCustomers();
+  else if(p==="technicians")renderTechs();
+  else if(p==="schedule")renderSched();
+  else if(p==="quotes")renderQuotes();
+}
+function fd(d){if(!d)return "-";try{return new Date(d).toLocaleDateString("en-AU",{day:"numeric",month:"short",year:"numeric"});}catch(e){return d;}}
+function td(){return new Date().toISOString().split("T")[0];}
+function sb(s){var m={active:"bg2",scheduled:"bb",pending:"by",completed:"bgr",sent:"bg2",draft:"by"};return '<span class="bdg '+(m[s]||"bb")+'">'+s+"</span>";}
+function pt(p){var m={high:"#f78166",medium:"#e3b341",low:"#56d364"};return '<span style="color:'+(m[p]||"#8b949e")+';font-size:11px;font-weight:600">&#9679; '+p+"</span>";}
+function tsl(s){return s==="on-site"?"&#128308; On-site":s==="en-route"?"&#129000; En route":"&#128994; Available";}
+function ini(n){return n.split(" ").map(function(w){return w[0];}).join("").toUpperCase().slice(0,2);}
+function gjc(n){return jobs.filter(function(j){return j.cust===n;}).length;}
+function glj(n){var jj=jobs.filter(function(j){return j.cust===n;}).sort(function(a,b){return b.date.localeCompare(a.date);});return jj.length?fd(jj[0].date):"-";}
+function updBdg(){document.getElementById("jbdg").textContent=jobs.filter(function(j){return j.status!=="completed";}).length;}
+function addAct(ic,bg,tx){var now=new Date();acts.unshift({ic:ic,bg:bg,tx:tx,tm:now.toLocaleTimeString("en-AU",{hour:"2-digit",minute:"2-digit"})+" today"});if(acts.length>15)acts.pop();sv("acts",acts);}
+
+function rdash(){
+  var ac=jobs.filter(function(j){return j.status==="active";}).length;
+  var tj=jobs.filter(function(j){return j.date===td();});
+  var cp=tj.filter(function(j){return j.status==="completed";}).length;
+  var os=techs.filter(function(t){return t.status==="on-site";}).length;
+  var av=techs.filter(function(t){return t.status==="available";}).length;
+  var pq=quotes.filter(function(q){return q.status!=="approved";});
+  var pl=pq.reduce(function(s,q){return s+(q.amt||0);},0);
+  document.getElementById("s1").textContent=ac;
+  document.getElementById("s1s").textContent=ac+" in progress";
+  document.getElementById("s2").textContent=tj.length;
+  document.getElementById("s2s").textContent=cp+" completed";
+  document.getElementById("s3").textContent=os;
+  document.getElementById("s3s").textContent=av+" available";
+  document.getElementById("s4").textContent=pq.length;
+  document.getElementById("s4s").textContent="$"+pl.toLocaleString()+" pipeline";
+  updBdg();
+  var sc={active:0,scheduled:0,pending:0,completed:0};
+  jobs.forEach(function(j){if(sc[j.status]!==undefined)sc[j.status]++;});
+  var pc={high:0,medium:0,low:0};
+  jobs.forEach(function(j){if(pc[j.pri]!==undefined)pc[j.pri]++;});
+  var opt=function(lb,dt,cl){return {type:"doughnut",data:{labels:lb,datasets:[{data:dt,backgroundColor:cl,borderColor:"#161b22",borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right",labels:{color:"#8b949e",font:{size:10},boxWidth:10}}},cutout:"65%"}};};
+  if(sc1)sc1.destroy();if(sc2)sc2.destroy();
+  sc1=new Chart(document.getElementById("cst"),opt(["Active","Scheduled","Pending","Done"],[sc.active,sc.scheduled,sc.pending,sc.completed],["#56d364","#2ea8ff","#e3b341","#484f58"]));
+  sc2=new Chart(document.getElementById("cpr"),opt(["High","Medium","Low"],[pc.high,pc.medium,pc.low],["#f78166","#e3b341","#56d364"]));
+  var lj=jobs.filter(function(j){return j.status==="active"||j.status==="scheduled";}).slice(0,5);
+  document.getElementById("djobs").innerHTML=lj.length?lj.map(function(j){return '<div class="ji" style="cursor:pointer" onclick="openJD('+j.id+')"><div class="jd '+j.status+'"></div><div class="ji-info"><div class="jn">'+j.desc+'</div><div class="jm">'+(j.tech||"Unassigned")+" - "+j.addr+'</div></div>'+pt(j.pri)+"</div>";}).join(""):'<div style="color:var(--tx2);padding:10px 0;font-size:12px">No active jobs</div>';
+  document.getElementById("dtechs").innerHTML=techs.map(function(t){return '<div class="ji"><div style="width:30px;height:30px;border-radius:50%;background:rgba(46,168,255,0.15);color:'+t.col+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0">'+t.ini+'</div><div class="ji-info"><div class="jn">'+t.name+'</div><div class="jm">'+tsl(t.status)+" - "+(t.cur||"No job")+"</div></div></div>";}).join("");
+  document.getElementById("dact").innerHTML=acts.slice(0,4).map(function(a){return '<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)"><div style="width:26px;height:26px;border-radius:5px;background:'+a.bg+';display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">'+a.ic+'</div><div><div style="font-size:12px">'+a.tx+'</div><div style="font-size:10px;color:var(--tx2);margin-top:2px">'+a.tm+"</div></div></div>";}).join("");
+}
+
+function renderJobs(){
+  var q=(document.getElementById("jsrch")||{value:""}).value;
+  var sf=(document.getElementById("jsf")||{value:""}).value;
+  var pf=(document.getElementById("jpf")||{value:""}).value;
+  var l=jobs;
+  if(q)l=l.filter(function(j){return [j.desc,j.cust,j.addr,j.tech].join(" ").toLowerCase().indexOf(q.toLowerCase())>=0;});
+  if(sf)l=l.filter(function(j){return j.status===sf;});
+  if(pf)l=l.filter(function(j){return j.pri===pf;});
+  document.getElementById("jtbl").innerHTML=l.length?l.map(function(j){return '<tr class="cr" onclick="openJD('+j.id+')"><td><strong>'+j.desc+'</strong><br><span style="color:var(--tx2);font-size:10px">'+j.addr+'</span></td><td>'+j.cust+'</td><td>'+(j.tech||'<span style="color:var(--warn)">Unassigned</span>')+'</td><td>'+sb(j.status)+'</td><td>'+pt(j.pri)+'</td><td style="color:var(--tx2);font-size:11px">'+fd(j.date)+'</td><td><span class="bdg bgr">'+((j.notes||[]).length)+'</span></td><td onclick="event.stopPropagation()"><button class="btn bdr bsm" onclick="delJob('+j.id+')">Del</button></td></tr>';}).join(""):'<tr><td colspan="8" style="text-align:center;color:var(--tx2);padding:24px">No jobs found</td></tr>';
+}
+function delJob(id){if(!confirm("Delete job?"))return;jobs=jobs.filter(function(j){return j.id!==id;});sv("jobs",jobs);rp(curPage);}
+
+function openJD(id){
+  editJid=id;
+  var j=jobs.find(function(j){return j.id===id;});if(!j)return;
+  var to=techs.map(function(t){return '<option'+(t.name===j.tech?" selected":"")+">"+t.name+"</option>";}).join("");
+  document.getElementById("mo2t").textContent="Job #"+j.id+" - "+j.desc;
+  var ns=(j.notes||[]).length?(j.notes||[]).map(function(n){return '<div class="ni2"><div class="nm">'+n.t+'</div><div class="nt">'+n.txt+"</div></div>";}).join(""):'<div style="color:var(--tx2);font-size:12px">No notes yet</div>';
+  document.getElementById("mo2b").innerHTML='<div class="fr" style="margin-bottom:12px"><div class="fg"><label>Description</label><input id="jd1" value="'+j.desc+'"></div><div class="fg"><label>Address</label><input id="jd2" value="'+j.addr+'"></div><div class="fg"><label>Customer</label><input id="jd3" value="'+j.cust+'"></div><div class="fg"><label>Technician</label><select id="jd4"><option value="">- Unassigned</option>'+to+'</select></div><div class="fg"><label>Status</label><select id="jd5"><option'+(j.status==="pending"?" selected":"")+'>pending</option><option'+(j.status==="scheduled"?" selected":"")+'>scheduled</option><option'+(j.status==="active"?" selected":"")+'>active</option><option'+(j.status==="completed"?" selected":"")+'>completed</option></select></div><div class="fg"><label>Priority</label><select id="jd6"><option'+(j.pri==="high"?" selected":"")+'>high</option><option'+(j.pri==="medium"?" selected":"")+'>medium</option><option'+(j.pri==="low"?" selected":"")+'>low</option></select></div><div class="fg"><label>Date</label><input type="date" id="jd7" value="'+j.date+'"></div></div><div class="nts"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--tx2);margin-bottom:10px">Notes</div><div id="jnl">'+ns+'</div><div class="nrow"><input class="ninp" id="jni" placeholder="Add a note..."><button class="btn bp bsm" onclick="addNote('+id+')">Add</button></div></div>';
+  document.getElementById("mo2").classList.add("open");
+}
+function addNote(id){
+  var inp=document.getElementById("jni"),txt=inp.value.trim();if(!txt)return;
+  var j=jobs.find(function(j){return j.id===id;});if(!j)return;
+  if(!j.notes)j.notes=[];
+  var now=new Date();
+  j.notes.push({t:now.toLocaleTimeString("en-AU",{hour:"2-digit",minute:"2-digit"})+" - "+now.toLocaleDateString("en-AU"),txt:txt});
+  sv("jobs",jobs);inp.value="";
+  document.getElementById("jnl").innerHTML=j.notes.map(function(n){return '<div class="ni2"><div class="nm">'+n.t+'</div><div class="nt">'+n.txt+"</div></div>";}).join("");
+}
+function saveJob(){
+  var j=jobs.find(function(j){return j.id===editJid;});if(!j)return;
+  j.desc=document.getElementById("jd1").value||j.desc;
+  j.addr=document.getElementById("jd2").value||j.addr;
+  j.cust=document.getElementById("jd3").value||j.cust;
+  j.tech=document.getElementById("jd4").value;
+  j.status=document.getElementById("jd5").value;
+  j.pri=document.getElementById("jd6").value;
+  j.date=document.getElementById("jd7").value||j.date;
+  sv("jobs",jobs);closeMo2();rp(curPage);
+  addAct("&#9999;","rgba(46,168,255,0.15)","<strong>Job updated</strong> - "+j.desc);
+}
+function closeMo2(){document.getElementById("mo2").classList.remove("open");}
+function closeMo3(){document.getElementById("mo3").classList.remove("open");}
+
+function renderCustomers(){
+  var q=(document.getElementById("csrch")||{value:""}).value;
+  var l=custs;
+  if(q)l=l.filter(function(c){return [c.name,c.phone,c.email,c.addr].join(" ").toLowerCase().indexOf(q.toLowerCase())>=0;});
+  document.getElementById("ctbl").innerHTML=l.length?l.map(function(c){var av=ini(c.name);return '<tr class="cr" onclick="openCust(\''+c.id+'\')"><td><div style="display:flex;align-items:center;gap:9px"><div style="width:28px;height:28px;border-radius:50%;background:rgba(46,168,255,0.15);color:var(--ac);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px">'+av+'</div><strong>'+c.name+'</strong></div></td><td style="font-size:11px">'+(c.phone||"-")+'</td><td style="color:var(--tx2);font-size:11px">'+(c.email||"-")+'</td><td style="color:var(--tx2)">'+(c.addr||"-")+'</td><td><span class="bdg bb">'+gjc(c.name)+' jobs</span></td><td style="color:var(--tx2);font-size:11px">'+glj(c.name)+'</td><td onclick="event.stopPropagation()"><button class="btn bdr bsm" onclick="delCust(\''+c.id+'\')">Del</button></td></tr>';}).join(""):'<tr><td colspan="7" style="text-align:center;color:var(--tx2);padding:24px">No customers</td></tr>';
+}
+function delCust(id){if(!confirm("Delete customer?"))return;custs=custs.filter(function(c){return c.id!==id;});sv("custs",custs);renderCustomers();}
+function openCust(id){
+  var c=custs.find(function(c){return c.id===id;});if(!c)return;
+  var cj=jobs.filter(function(j){return j.cust===c.name;});
+  var jrows=cj.length?cj.map(function(j){return '<tr class="cr" onclick="closeMo3();openJD('+j.id+')"><td><strong>'+j.desc+'</strong></td><td>'+sb(j.status)+'</td><td>'+(j.tech||"Unassigned")+'</td><td style="color:var(--tx2);font-size:11px">'+fd(j.date)+'</td><td><span class="bdg bgr">'+((j.notes||[]).length)+"</span></td></tr>";}).join(""):"";
+  document.getElementById("mo3b").innerHTML='<div class="chero"><div class="cav">'+ini(c.name)+'</div><div><div class="cnl">'+c.name+'</div><div class="cml">'+(c.email||"")+(c.phone?" - "+c.phone:"")+'</div><div class="cml" style="margin-top:2px">'+(c.addr||"")+'</div></div></div>'+(c.note?'<div style="background:rgba(46,168,255,0.07);border:1px solid rgba(46,168,255,0.2);border-radius:7px;padding:10px;margin-bottom:16px;font-size:12px;color:var(--tx2)">&#128204; '+c.note+"</div>":"")+'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--tx2);margin-bottom:10px">Job History ('+cj.length+')</div>'+(cj.length?'<div style="background:var(--sf2);border:1px solid var(--bd);border-radius:7px;overflow:hidden"><table><thead><tr><th>Job</th><th>Status</th><th>Tech</th><th>Date</th><th>Notes</th></tr></thead><tbody>'+jrows+"</tbody></table></div>":'<div style="color:var(--tx2);font-size:12px">No jobs yet</div>');
+  document.getElementById("mo3").classList.add("open");
+}
+
+function renderTechs(){
+  document.getElementById("ttbl").innerHTML=techs.map(function(t){
+    var sc=t.status==="on-site"?"var(--ac3)":t.status==="en-route"?"var(--warn)":"var(--tx2)";
+    return '<tr><td><div style="display:flex;align-items:center;gap:9px"><div style="width:28px;height:28px;border-radius:50%;background:rgba(46,168,255,0.15);color:'+t.col+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px">'+t.ini+'</div><strong>'+t.name+'</strong></div></td><td style="font-size:11px">'+t.phone+'</td><td><select onchange="updT(\''+t.id+'\',this.value)" style="background:transparent;border:none;color:'+sc+';font-weight:600;font-size:11px;cursor:pointer;padding:2px;width:auto"><option'+(t.status==="available"?" selected":"")+' value="available">&#128994; Available</option><option'+(t.status==="en-route"?" selected":"")+' value="en-route">&#128993; En route</option><option'+(t.status==="on-site"?" selected":"")+' value="on-site">&#128308; On-site</option></select></td><td style="color:var(--tx2);font-size:11px">'+(t.cur||"-")+'</td><td><span class="bdg bb">'+t.today+'</span></td><td style="color:var(--tx2);font-size:11px">'+t.skills+'</td><td><button class="btn bdr bsm" onclick="delT(\''+t.id+'\')">Remove</button></td></tr>';
+  }).join("");
+}
+function updT(id,s){var t=techs.find(function(t){return t.id===id;});if(t){t.status=s;sv("techs",techs);}}
+function delT(id){if(!confirm("Remove?"))return;techs=techs.filter(function(t){return t.id!==id;});sv("techs",techs);renderTechs();}
+
+function renderSched(){
+  var d=new Date();
+  document.getElementById("schdt").textContent="Today - "+d.toLocaleDateString("en-AU",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  var tj=jobs.filter(function(j){return j.date===td();}).sort(function(a,b){var o={active:0,scheduled:1,pending:2,completed:3};return (o[a.status]||9)-(o[b.status]||9);});
+  document.getElementById("schl").innerHTML=tj.length?tj.map(function(j){return '<div class="ji" style="padding:12px 0;cursor:pointer" onclick="openJD('+j.id+')"><div class="jd '+j.status+'" style="flex-shrink:0"></div><div class="ji-info"><div class="jn">'+j.desc+" - "+j.addr+'</div><div class="jm">'+(j.tech||"Unassigned")+" - "+j.cust+'</div></div><div style="display:flex;gap:6px">'+sb(j.status)+pt(j.pri)+"</div></div>";}).join(""):'<div style="color:var(--tx2);font-size:12px;padding:16px 0;text-align:center">No jobs today</div>';
+}
+
+function renderQuotes(){
+  document.getElementById("qtbl").innerHTML=quotes.length?quotes.map(function(q){return '<tr><td style="font-family:\'DM Mono\',monospace;color:var(--ac)">'+q.id+'</td><td><strong>'+q.cust+'</strong></td><td style="color:var(--tx2)">'+q.desc+'</td><td style="font-weight:700;color:var(--ac3)">$'+((q.amt||0).toLocaleString())+'</td><td>'+sb(q.status)+'</td><td style="color:var(--tx2);font-size:11px">'+fd(q.created)+'</td><td><button class="btn bdr bsm" onclick="delQ(\''+q.id+'\')">Del</button></td></tr>';}).join(""):'<tr><td colspan="7" style="text-align:center;color:var(--tx2);padding:24px">No quotes</td></tr>';
+}
+function delQ(id){if(!confirm("Delete?"))return;quotes=quotes.filter(function(q){return q.id!==id;});sv("quotes",quotes);renderQuotes();}
+
+function openAdd(){
+  mm=curPage==="customers"?"customer":curPage==="technicians"?"tech":curPage==="quotes"?"quote":"job";
+  var to=techs.map(function(t){return "<option>"+t.name+"</option>";}).join("");
+  var co=custs.map(function(c){return "<option>"+c.name+"</option>";}).join("");
+  var fs={
+    job:'<div class="fr"><div class="fg"><label>Description</label><input id="f1" placeholder="e.g. Burst pipe repair"></div><div class="fg"><label>Customer</label><select id="f2"><option value="">- Select</option>'+co+'</select></div></div><div class="fg"><label>Address</label><input id="f3" placeholder="Job site address"></div><div class="fr"><div class="fg"><label>Technician</label><select id="f4"><option value="">- Unassigned</option>'+to+'</select></div><div class="fg"><label>Date</label><input type="date" id="f5" value="'+td()+'"></div></div><div class="fr"><div class="fg"><label>Priority</label><select id="f6"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select></div><div class="fg"><label>Status</label><select id="f7"><option value="pending">Pending</option><option value="scheduled">Scheduled</option><option value="active">Active</option></select></div></div><div class="fg"><label>Note (optional)</label><textarea id="f8" placeholder="Any notes..."></textarea></div>',
+    customer:'<div class="fr"><div class="fg"><label>Full Name</label><input id="f1" placeholder="Customer name"></div><div class="fg"><label>Phone</label><input id="f2" placeholder="04XX XXX XXX"></div></div><div class="fg"><label>Email</label><input id="f3" type="email" placeholder="email@example.com"></div><div class="fg"><label>Address</label><input id="f4" placeholder="Full address"></div><div class="fg"><label>Notes</label><textarea id="f5" placeholder="Special notes..."></textarea></div>',
+    tech:'<div class="fr"><div class="fg"><label>Full Name</label><input id="f1" placeholder="Technician name"></div><div class="fg"><label>Phone</label><input id="f2" placeholder="04XX XXX XXX"></div></div><div class="fg"><label>Skills</label><input id="f3" placeholder="e.g. Emergency, Gas Fitting"></div>',
+    quote:'<div class="fr"><div class="fg"><label>Customer</label><select id="f1"><option value="">- Select</option>'+co+'</select></div><div class="fg"><label>Amount ($)</label><input id="f2" type="number" placeholder="e.g. 1200"></div></div><div class="fg"><label>Description</label><textarea id="f3" placeholder="Scope of work..."></textarea></div><div class="fg"><label>Status</label><select id="f4"><option value="draft">Draft</option><option value="pending">Pending</option><option value="sent">Sent</option></select></div>'
+  };
+  var tl={job:"New Job",customer:"New Customer",tech:"Add Technician",quote:"New Quote"};
+  document.getElementById("mo1t").textContent=tl[mm];
+  document.getElementById("mo1b").innerHTML=fs[mm];
+  document.getElementById("mo1f").innerHTML='<button class="btn bg" onclick="closeMo()">Cancel</button><button class="btn bp" onclick="saveRec()">Save</button>';
+  document.getElementById("mo1").classList.add("open");
+}
+function closeMo(){document.getElementById("mo1").classList.remove("open");}
+function gv(id){var el=document.getElementById(id);return el?el.value:"";}
+function saveRec(){
+  if(mm==="job"){
+    var desc=gv("f1")||"New Job",cust=gv("f2")||"Unknown",addr=gv("f3"),tech=gv("f4"),date=gv("f5")||td(),pri=gv("f6"),status=gv("f7"),note=gv("f8").trim();
+    var notes=note?[{t:"Created - "+new Date().toLocaleDateString("en-AU"),txt:note}]:[];
+    jobs.push({id:Date.now(),desc:desc,addr:addr,cust:cust,tech:tech,status:status,date:date,pri:pri,notes:notes});
+    addAct("&#128297;","rgba(46,168,255,0.15)","<strong>New job</strong> - "+desc+" - "+cust);
+  }else if(mm==="customer"){
+    var name=gv("f1")||"New Customer";
+    custs.push({id:"c"+Date.now(),name:name,phone:gv("f2"),email:gv("f3"),addr:gv("f4"),note:gv("f5")});
+    addAct("&#128101;","rgba(86,211,100,0.15)","<strong>Customer added</strong> - "+name);
+  }else if(mm==="tech"){
+    var tname=gv("f1")||"New Tech";
+    var cols=["#2ea8ff","#56d364","#e3b341","#f78166","#a371f7"];
+    techs.push({id:"t"+Date.now(),name:tname,ini:ini(tname),phone:gv("f2"),status:"available",cur:"",today:0,skills:gv("f3")||"General",col:cols[techs.length%cols.length]});
+    addAct("&#128119;","rgba(227,179,65,0.15)","<strong>Technician added</strong> - "+tname);
+  }else if(mm==="quote"){
+    var qc=gv("f1")||"Unknown",qa=parseFloat(gv("f2"))||0,qd=gv("f3")||"Quote",qs=gv("f4");
+    var qid="Q-"+String(quotes.length+1).padStart(3,"0");
+    quotes.push({id:qid,cust:qc,desc:qd,amt:qa,status:qs,created:td()});
+    addAct("&#128176;","rgba(86,211,100,0.15)","<strong>Quote created</strong> - $"+qa.toLocaleString()+" - "+qc);
+  }
+  svAll();closeMo();rp(curPage);
+}
+
+function toggleAI(){aiOpen=!aiOpen;document.getElementById("aip").classList.toggle("open",aiOpen);}
+function aikey(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendAI();}}
+function sug(el){document.getElementById("aiinp").value=el.textContent;sendAI();}
+function bsp(){
+  var aj=jobs.filter(function(j){return j.status!=="completed";});
+  var uj=jobs.filter(function(j){return !j.tech&&j.status!=="completed";});
+  var at=techs.filter(function(t){return t.status==="available";});
+  return "You are FlowPro AI for a Melbourne plumbing company.\n\nJobs ("+aj.length+" active, "+uj.length+" unassigned):\n"+aj.map(function(j){return "- #"+j.id+": "+j.desc+" @ "+j.addr+" | "+j.cust+" | Tech:"+(j.tech||"NONE")+" | "+j.status+" | "+j.pri;}).join("\n")+"\n\nTechs ("+at.length+" available):\n"+techs.map(function(t){return "- "+t.name+": "+t.status+" | "+t.skills;}).join("\n")+"\n\nCustomers: "+custs.map(function(c){return c.name;}).join(", ")+"\n\nBe concise. Use bullets. AUD prices. Labour ~$120-180/hr + GST.";
+}
+async function sendAI(){
+  var inp=document.getElementById("aiinp"),tx=inp.value.trim();if(!tx)return;
+  inp.value="";amsg("u",tx);aiHist.push({role:"user",content:tx});
+  var tid=aty();
+  try{
+    var r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"YOUR_API_KEY_HERE","anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,system:bsp(),messages:aiHist})});
+    var d=await r.json();
+    var rep=(d.content&&d.content[0]&&d.content[0].text)||"Sorry, try again.";
+    rty(tid);amsg("a",rep);aiHist.push({role:"assistant",content:rep});
+  }catch(e){rty(tid);amsg("a","AI unavailable - add your API key on Saturday to enable this.");}
+}
+function amsg(role,text){
+  var m=document.getElementById("aim"),d=document.createElement("div");d.className="msg "+role;
+  var f=text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>").replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>");
+  d.innerHTML='<div class="ml">'+(role==="u"?"You":"AI Agent")+'</div><div class="mb2">'+f+"</div>";
+  m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+function aty(){var m=document.getElementById("aim"),id="ty"+Date.now(),d=document.createElement("div");d.id=id;d.className="msg a";d.innerHTML='<div class="ml">AI Agent</div><div class="mb2" style="padding:7px 12px"><div class="ty"><span></span><span></span><span></span></div></div>';m.appendChild(d);m.scrollTop=m.scrollHeight;return id;}
+function rty(id){var el=document.getElementById(id);if(el)el.remove();}
+
+updBdg();rdash();
+</script>
+</body>
+</html>
